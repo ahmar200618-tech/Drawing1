@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Drawing 1: Step by Step</title>
+<style>
+:root{--bg:#ffffff;--fg:#1c1c1e;--mut:#6b7280;--ac:#e0620d;--bl:#1a5fb4;--card:#f1f3f6;--ln:#1c1c1e;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--fg:#ececec;--mut:#9aa0a8;--ac:#ff9a4d;--bl:#7fb2ff;--card:#23262b;--ln:#ececec;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15171a;--fg:#ececec;--mut:#9aa0a8;--ac:#ff9a4d;--bl:#7fb2ff;--card:#23262b;--ln:#ececec;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:clamp(15px,2.6vw + 9px,19px);-webkit-text-size-adjust:100%}
+.w{max-width:760px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 12px 150px}
+h1{font-size:1.15em;margin:2px 0 8px}
+.fig{background:var(--card);border-radius:14px;padding:4px}
+svg{width:100%;aspect-ratio:3/2;max-height:48vh;display:block;touch-action:manipulation}
+.l{fill:none;stroke:var(--ln);stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .9s ease,stroke .3s,stroke-width .3s}
+.l.on{stroke-dashoffset:0}
+.l.cur{stroke:var(--ac);stroke-width:1.9}
+.l.fin{stroke-width:1.9}
+.h,.c,.p,.z,.d{fill:none;opacity:0;transition:opacity .6s}
+.h{stroke:var(--ln);stroke-width:.7;stroke-dasharray:3 2}
+.c{stroke:var(--mut);stroke-width:.6;stroke-dasharray:8 2 1.5 2}
+.p{stroke:var(--mut);stroke-width:.5;stroke-dasharray:2.5 1.8}
+.z{stroke:var(--mut);stroke-width:.5;stroke-dasharray:3 2}
+.d{stroke:var(--bl);stroke-width:.5}
+.on{opacity:1}
+.l.on{opacity:1}
+.zt{font-size:10px;fill:var(--mut);opacity:0;transition:opacity .6s;text-anchor:middle}
+.t{font-size:8.5px;fill:var(--bl);font-weight:700;text-anchor:middle;opacity:0;transition:opacity .6s;paint-order:stroke;stroke:var(--card);stroke-width:2px;stroke-linejoin:round}
+.t.on,.zt.on{opacity:1}
+.cap{margin:10px 0 0;padding:12px 14px;background:var(--card);border-radius:14px;line-height:1.55}
+.ttl{font-weight:700;color:var(--ac);display:block;margin-bottom:3px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips span{background:var(--bg);border:1px solid var(--bl);color:var(--bl);border-radius:999px;padding:4px 11px;font-weight:700;font-size:.95em}
+#calc{display:none;margin:10px 0 0;padding:12px 14px;background:var(--card);border-radius:14px}
+#calc label{display:block;margin:6px 0}
+#calc input{width:5.5em;font:inherit;padding:6px;border-radius:8px;border:1px solid var(--mut);background:var(--bg);color:var(--fg)}
+#calc b{color:var(--ac)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--mut);padding:10px 12px max(10px,env(safe-area-inset-bottom))}
+.ctl{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:center}
+button{flex:1;min-height:54px;font-size:1.05em;border-radius:14px;border:1px solid var(--mut);background:var(--bg);color:var(--fg);font-family:inherit}
+button.p2{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700}
+button:disabled{opacity:.35}
+#n{min-width:62px;text-align:center;color:var(--mut);font-size:.9em}
+@media (orientation:landscape) and (max-height:520px){svg{max-height:62vh}.w{padding-bottom:110px}.cap{font-size:.92em}}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Drawing 1: step by step</h1>
+<div class="fig"><svg id="sv" viewBox="-38 -25 300 200" role="img"><title>Drawing 1 step by step</title><desc>Front, Top aur Side view</desc>
+<defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.6"/></marker></defs>
+<g id="g"></g></svg></div>
+<div class="cap" id="cap"></div>
+<div id="calc"><b>Apne chart ka naap (cm)</b>
+<label>Chart ki lambai x: <input id="cx" type="number" step="0.1" inputmode="decimal" value="66.4"></label>
+<label>Chart ki chaurai y: <input id="cy" type="number" step="0.1" inputmode="decimal" value="52.2"></label>
+<div id="ab" style="line-height:1.7"></div>
+<small style="color:var(--mut)">L = 15, W = 6, H = 7 cm. Side me 3 gap (kinara, beech, kinara), upar-neeche me bhi 3 gap.</small></div>
+</div>
+<div class="bar"><div class="ctl"><button id="bk">&#8592; Back</button><span id="n"></span><button class="p2" id="nx">Next &#8594;</button></div></div>
+<script>
+var T=16;
+var C=[
+["Chart par 3 dabbe","Chart seedha rakho.<br>1) Upar left me <b>Front View</b>.<br>2) Uske right me <b>Side View</b>.<br>3) Front ke neeche <b>Top View</b>.<br>Gap A left-right wala, gap B upar-neeche wala. Neeche apne chart ka naap daalo, A aur B khud nikal aayenge.",[]],
+["Front View: neeche ki patti","Front wale dabbe me:<br>1) Neeche ek seedhi line <b>15 cm</b> lambi.<br>2) Left kone se <b>2 cm seedha upar</b> line.<br>3) Wahan se right taraf sirf <b>9 cm</b> lambi aadi line (poori 15 cm nahi).<br>Ye 2 cm moti patti hai.",["Lambai 15","Motai 2","Upar line sirf 9"]],
+["Front View: hole ka center","Hole ka center do lines milne se banta hai:<br>1) Neeche line par left kone se <b>12 cm</b> par halki seedhi line upar tak (dash-dot).<br>2) Neeche line se <b>4 cm upar</b> aadi line (dash-dot), lambi.<br>3) Jahan dono milen wo <b>hole ka center</b> hai.",["Left se 12","Neeche se 4"]],
+["Front View: deewar ki lines","1) Left kone se <b>9 cm</b> par patti ki upar line se <b>2 cm seedha upar</b> line (neeche se 4 cm tak).<br>2) Right kinare par neeche se <b>4 cm</b> tak seedhi line.",["Left se 9","Deewar 2 cm","Right edge 4 cm"]],
+["Front View: upar ka gol (arc)","Compass lo.<br>1) Nok <b>hole ke center</b> par rakho.<br>2) Pencil tak <b>3 cm</b> (R30) kholo.<br>3) Left line ke upar wale sirey se shuru karo, upar ghoom kar right line ke sirey tak <b>aadha gol</b> banao.<br>Arc ka sabse upar ka point neeche se 7 cm par aayega.",["Radius 3 cm","Total unchai 7"]],
+["Front View: hole","Compass ko <b>1.5 cm</b> par set karo (nok wahi center). Poora <b>circle</b> banao. Ye Ø30 ka hole hai.",["Radius 1.5 cm"]],
+["Front View: slot ki chhupi lines","Patti ke andar slot chhupa hua hai:<br>1) Left se <b>2 cm</b> aur <b>7 cm</b> par patti me seedhi <b>dashed</b> (toote hue) lines, 2 cm unchi.<br>2) Left se <b>3 cm</b> aur <b>6 cm</b> par patti me <b>dash-dot</b> center lines, thodi bahar tak.",["Dashed: 2 aur 7","Dash-dot: 3 aur 6"]],
+["Lines neeche utaro","Front ki seedhi lines (left se 0, 2, 3, 6, 7, 9, 10.5, 12, 13.5, 15 cm) <b>halki pencil</b> se seedha neeche Top View ke dabbe tak le jao.",[]],
+["Top View: rectangle","Top View me ek rectangle banao:<br><b>15 cm lamba, 6 cm chaura</b>.<br>Left aur right kinare Front ki guide lines ke seedhe neeche honge.",["Lambai 15","Chaurai 6"]],
+["Top View: slot","Slot ek lambi gol-kinare wali khidki hai:<br>1) Rectangle ki upar wali line se <b>3 cm neeche</b> beech me aadi dash-dot line.<br>2) Left se <b>3 cm</b> aur <b>6 cm</b> par seedhi dash-dot lines.<br>3) In dono center par compass <b>1 cm</b> kholo, left wala <b>aadha gol left taraf</b>, right wala <b>right taraf</b> banao.<br>4) Dono ko upar aur neeche seedhi lines se jod do.<br>Slot 2 cm chaura, 5 cm lamba (2 cm se 7 cm tak).",["Center 3 aur 6","Chaurai 2","Lambai 5"]],
+["Top View: deewar aur hole ki lines","1) Left se <b>9 cm</b> par poori seedhi line (6 cm lambi).<br>2) Left se <b>10.5 cm</b> aur <b>13.5 cm</b> par <b>dashed</b> lines (hole ke chhupe kinare).<br>3) Left se <b>12 cm</b> par <b>dash-dot</b> center line.",["9 (solid)","10.5, 13.5 (dashed)","12 (dash-dot)"]],
+["Side View: lines side me nikalo","Front ki aadi lines ko <b>halki pencil</b> se right taraf Side View ke dabbe tak le jao.<br>Neeche se unchaiyan: 0, 2, 2.5, 4, 5.5, 7 cm.",["0, 2, 2.5","4, 5.5, 7"]],
+["Side View: rectangle","Side View ka dabba: <b>6 cm chaura, 7 cm unch</b> rectangle.<br>Neeche se <b>2 cm</b> par poori aadi line banao (base ka top).",["Chaurai 6","Unchai 7","Line 2 par"]],
+["Side View: chhupi aur center lines","1) Neeche se <b>2.5 cm</b> aur <b>5.5 cm</b> par poori chaurai me <b>dashed</b> lines (hole ke upar aur neeche).<br>2) Neeche se <b>4 cm</b> par <b>dash-dot</b> center line, thodi bahar tak.<br>3) Base me left se <b>2 cm</b> aur <b>4 cm</b> par seedhi <b>dashed</b> lines, aur <b>3 cm</b> par dash-dot (slot).",["Dashed 2.5, 5.5","Dash-dot 4","Slot 2, 3, 4"]],
+["Naap likho (Dimensions)","Guide lines mita do. Patli lines aur dono taraf tir se naap likho (<b>mm</b> me): 150, 20, 40, R30, Ø30 (Front); 60, 40 (Side); 30, 30, 20, 60 (Top).",["150","20","40","R30","Ø30","60","30","20"]],
+["Aakhri kaam","Outline <b>HB pencil</b> se gehri kar do. Hidden lines dashed aur center lines dash-dot hi rahen. Drawing 1 mukammal!",[]]];
+var F=[-38,-25,300,200],Fr=[-20,-22,190,127],Md=[-20,-10,190,127],Tp=[-20,88,190,127],Sd=[110,-22,175,117];
+var VB=[0,F,Fr,Fr,Fr,Fr,Fr,Fr,Md,Tp,Tp,Tp,Sd,Sd,Sd,F,F];
+var NS='http://www.w3.org/2000/svg',g=document.getElementById('g'),sv=document.getElementById('sv'),N=[];
+function mk(c,s,e,d){var el=document.createElementNS(NS,'path');el.setAttribute('d',d);if(c==='l')el.setAttribute('pathLength','1');if(c==='d'){el.setAttribute('marker-start','url(#ar)');el.setAttribute('marker-end','url(#ar)')}el.setAttribute('class',c);g.appendChild(el);N.push({el:el,s:s,e:e,c:c})}
+function tx(c,s,e,x,y,t){var el=document.createElementNS(NS,'text');el.setAttribute('x',x);el.setAttribute('y',y);el.textContent=t;el.setAttribute('class',c);g.appendChild(el);N.push({el:el,s:s,e:e,c:c})}
+function th(s,d){mk('l',s,99,d)}function hd(s,d){mk('h',s,99,d)}function ce(s,d){mk('c',s,99,d)}function pr(s,e,d){mk('p',s,e,d)}
+function sd(s,d,x,y,t){mk('d',s,s,d);tx('t',s,s,x,y,t)}
+function dm(d,x,y,t){mk('d',15,16,d);tx('t',15,16,x,y,t)}
+var Z={Front:[0,0,150,70],Side:[180,0,60,70],Top:[0,100,150,60]};
+for(var k in Z){var z=Z[k];mk('z',1,14,'M'+z[0]+','+z[1]+'h'+z[2]+'v'+z[3]+'h'+(-z[2])+'z');tx('zt',1,14,z[0]+z[2]/2,z[1]+z[3]/2+3,k)}
+/* Front */
+th(2,'M90,50L0,50L0,70L150,70');
+ce(3,'M120,-6L120,76');ce(3,'M84,30L156,30');
+th(4,'M90,50L90,30');th(4,'M150,70L150,30');
+th(5,'M90,30A30,30 0 0 1 150,30');
+th(6,'M105,30A15,15 0 1 1 135,30A15,15 0 1 1 105,30');
+hd(7,'M20,50L20,70');hd(7,'M70,50L70,70');ce(7,'M30,46L30,76');ce(7,'M60,46L60,76');
+/* guides down */
+[0,20,30,60,70,90,105,120,135,150].forEach(function(x){pr(8,11,'M'+x+',74L'+x+',100')});
+/* Top */
+th(9,'M0,100L150,100L150,160L0,160Z');
+th(10,'M30,120L60,120A10,10 0 0 1 60,140L30,140A10,10 0 0 1 30,120');
+ce(10,'M12,130L78,130');ce(10,'M30,116L30,144');ce(10,'M60,116L60,144');
+th(11,'M90,100L90,160');hd(11,'M105,100L105,160');hd(11,'M135,100L135,160');ce(11,'M120,95L120,165');
+/* Side */
+[0,15,30,45,50,70].forEach(function(y){pr(12,13,'M152,'+y+'L180,'+y)});
+th(13,'M180,0L240,0L240,70L180,70Z');th(13,'M180,50L240,50');
+hd(14,'M180,15L240,15');hd(14,'M180,45L240,45');ce(14,'M156,30L248,30');
+hd(14,'M200,50L200,70');hd(14,'M220,50L220,70');ce(14,'M210,46L210,76');
+/* step helpers */
+sd(2,'M0,80L150,80',75,78,'15');sd(2,'M-8,50L-8,70',-14,62,'2');
+sd(3,'M0,-12L120,-12',60,-15,'12');sd(3,'M164,30L164,70',171,52,'4');
+sd(4,'M0,-12L90,-12',45,-15,'9');sd(4,'M-8,30L-8,50',-14,42,'2');
+sd(5,'M120,30L99,9',90,7,'R3');
+sd(6,'M105,38L135,38',120,35,'Ø3');
+sd(7,'M0,80L20,80',10,78,'2');sd(7,'M0,90L70,90',35,88,'7');
+sd(9,'M0,168L150,168',75,166,'15');sd(9,'M160,100L160,160',166,132,'6');
+sd(10,'M0,168L30,168',15,166,'3');sd(10,'M30,168L60,168',45,166,'3');sd(10,'M-12,100L-12,130',-18,117,'3');sd(10,'M80,120L80,140',86,132,'2');
+sd(11,'M0,168L90,168',45,166,'9');
+sd(13,'M180,80L240,80',210,78,'6');sd(13,'M250,0L250,70',256,38,'7');sd(13,'M170,50L170,70',164,62,'2');
+/* final dims (mm) */
+dm('M0,80L150,80',75,78,'150');dm('M-8,50L-8,70',-14,62,'20');dm('M160,30L160,70',167,52,'40');
+tx('t',15,16,78,6,'R30');tx('t',15,16,120,60,'Ø30');
+dm('M180,80L240,80',210,78,'60');dm('M250,30L250,70',256,52,'40');
+dm('M0,168L30,168',15,166,'30');dm('M30,168L60,168',45,166,'30');dm('M-12,120L-12,140',-18,132,'20');dm('M160,100L160,160',166,132,'60');
+var n=1,cur=F.slice(),raf=0;
+function zoom(t){cancelAnimationFrame(raf);var a=cur.slice(),t0=null;
+function f(ts){if(t0===null)t0=ts;var k=Math.min(1,(ts-t0)/500),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+cur=a.map(function(v,i){return v+(t[i]-v)*e});sv.setAttribute('viewBox',cur.join(' '));if(k<1)raf=requestAnimationFrame(f)}
+raf=requestAnimationFrame(f)}
+function calc(){var x=parseFloat(document.getElementById('cx').value),y=parseFloat(document.getElementById('cy').value),o=document.getElementById('ab');
+if(!(x>0&&y>0)){o.textContent='';return}
+var A=(x-(15+6))/3,B=(y-(7+6))/3;
+o.innerHTML=(A<0||B<0)?'Chart chhota hai, bada chart lo.':'A = ('+x+' &minus; 21) &divide; 3 = <b>'+A.toFixed(2)+' cm</b><br>B = ('+y+' &minus; 13) &divide; 3 = <b>'+B.toFixed(2)+' cm</b>'}
+document.getElementById('cx').oninput=calc;document.getElementById('cy').oninput=calc;
+function r(){N.forEach(function(o){var on=n>=o.s&&n<=o.e,c=o.el.classList;c.toggle('on',on);c.toggle('cur',on&&o.s===n&&o.c==='l');c.toggle('fin',o.c==='l'&&n===T)});
+var s=C[n-1],h='<span class="ttl">Step '+n+' / '+T+': '+s[0]+'</span>'+s[1];
+if(s[2].length)h+='<div class="chips">'+s[2].map(function(x){return '<span>'+x+'</span>'}).join('')+'</div>';
+document.getElementById('cap').innerHTML=h;
+document.getElementById('calc').style.display=n===1?'block':'none';if(n===1)calc();
+document.getElementById('n').textContent=n+' / '+T;
+document.getElementById('bk').disabled=n===1;document.getElementById('nx').disabled=n===T;
+zoom(VB[n])}
+function go(d){var m=n+d;if(m>=1&&m<=T){n=m;r()}}
+document.getElementById('nx').onclick=function(){go(1)};
+document.getElementById('bk').onclick=function(){go(-1)};
+document.onkeydown=function(e){if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1)};
+var tx0=0;document.addEventListener('touchstart',function(e){tx0=e.changedTouches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx0;if(Math.abs(d)>70)go(d<0?1:-1)},{passive:true});
+r();
+</script>
+</body>
+</html>
